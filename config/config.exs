@@ -7,10 +7,7 @@
 # General application configuration
 import Config
 
-config :dlink, data_root: "data", inbox_ns: "inbox"
-
-# Hardcoded client pairs
-config :dlink, pairs: %{"A" => "B", "B" => "A"}
+config :dlink, data_root: "inbox"
 
 config :dlink,
   generators: [timestamp_type: :utc_datetime]

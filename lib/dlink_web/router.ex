@@ -2,13 +2,13 @@ defmodule DlinkWeb.Router do
   use DlinkWeb, :router
 
   pipeline :api do
+    plug CORSPlug, origin: "http://localhost:5000"
     plug :accepts, ["json"]
   end
 
   scope "/v1", DlinkWeb do
     pipe_through :api
-    post "/clients/:from/messages", MessageController, :upload
-    get "/clients/:id/inbox", MessageController, :inbox
-    get "/clients/:id/next", MessageController, :next
+    post "/inbox/:key/:client", MessageController, :upload
+    get "/inbox/:key/:client", MessageController, :inbox
   end
 end
