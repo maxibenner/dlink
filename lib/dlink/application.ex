@@ -12,7 +12,6 @@ defmodule Dlink.Application do
       {DNSCluster, query: Application.get_env(:dlink, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Dlink.PubSub},
       # Start a worker by calling: Dlink.Worker.start_link(arg)
-      # {Dlink.Worker, arg},
       # Start to serve requests, typically the last entry
       DlinkWeb.Endpoint
     ]

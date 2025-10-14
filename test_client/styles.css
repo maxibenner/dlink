@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr 50svh;
+  align-items: center;
+  justify-items: center;
+  background-color: grey;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  background: #efefef;
+  font-weight: bold;
+  width: 70px;
+  height: 70px;
+  background-color: rgb(171, 171, 171);
+}
+
+body.active {
+  background: white;
+}
+
+body.active button {
+  background: rgb(226, 226, 226);
+}
+
+pre {
+  position: relative;
+  width: 100vw;
+  height: 100%;
+  background: black;
+  padding: 12px;
+  color: rgb(0, 240, 0);
+  overflow-x: hidden;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

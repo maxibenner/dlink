@@ -12,6 +12,15 @@ config :dlink, data_root: "inbox"
 config :dlink,
   generators: [timestamp_type: :utc_datetime]
 
+# Database
+config :dlink, Repo,
+  database: "main",
+  username: "postgres",
+  password: "sqlite3",
+  hostname: "localhost",
+  # OR use a URL to connect instead
+  url: "postgres://postgres:postgres@localhost/ecto_simple"
+
 # Configures the endpoint
 config :dlink, DlinkWeb.Endpoint,
   url: [host: "localhost"],

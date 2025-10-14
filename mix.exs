@@ -55,7 +55,9 @@ defmodule Dlink.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:cors_plug, "~> 3.0"}
+      {:cors_plug, "~> 3.0"},
+      {:ecto, "~> 3.13"},
+      {:ecto_sqlite3, "~> 0.22.0"}
     ]
   end
 
