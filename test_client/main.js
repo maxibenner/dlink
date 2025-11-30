@@ -18,31 +18,34 @@ navigator.mediaDevices.getUserMedia({ audio: true });
 
 // window.addEventListener("DOMContentLoaded", requestMicPermission);
 
-async function main() {
-  const res = await client.init();
-}
+// async function main() {
+//   const res = await client.init();
+// }
 
-main();
+// main();
 
 async function handleClick() {
-  switch (client.state) {
-    case "INCOMING":
-      audioElement.src = client.audioObjUrl;
-      audioElement.play();
-      logToScreen(consoleElement, "Playback started.");
-      audioElement.onended = () => {
-        logToScreen(consoleElement, "Playback finished.");
-        client.inbox();
-      };
-      break;
-    case "EMPTY":
-      client.recordingStart();
-      break;
-    case "RECORDING": {
-      client.recordingStop();
-      break;
-    }
-  }
+  const hasMessage = await client.hasMessage(client.key);
+  logToScreen(consoleElement, "Inbox " + client.key + " has message: " + hasMessage);
+
+  // switch (client.state) {
+  //   case "INCOMING":
+  //     audioElement.src = client.audioObjUrl;
+  //     audioElement.play();
+  //     logToScreen(consoleElement, "Playback started.");
+  //     audioElement.onended = () => {
+  //       logToScreen(consoleElement, "Playback finished.");
+  //       // client.inbox();
+  //     };
+  //     break;
+  //   case "EMPTY":
+  //     client.recordingStart();
+  //     break;
+  //   case "RECORDING": {
+  //     client.recordingStop();
+  //     break;
+  //   }
+  // }
 }
 
 buttonElement.addEventListener("click", handleClick);

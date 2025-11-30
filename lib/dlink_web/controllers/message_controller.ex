@@ -26,43 +26,14 @@ defmodule DlinkWeb.MessageController do
     end
   end
 
-  # GET /v1/inbox/:key/:client  -> boolean
-  # Presence is simply "does <client>.ogg exist?"
-  def inbox(conn, %{"key" => key, "client" => client}) do
+  # GET /v1/inbox/:owner  -> boolean
+  # Checks if <owner>.ogg exists
+  def status(conn, %{"owner" => owner}) do
     Logger.debug("running")
-    file_path = Path.join([inbox_dir(key), "#{client}.ogg"])
+    file_path = Path.join([@root, "#{owner}.ogg"])
     Logger.debug(file_path)
-
-    case File.ls(inbox_dir(key)) do
-      {:ok, files} ->
-        Logger.debug("Files")
-        Logger.debug(files)
-
-        cond do
-          "#{client}.ogg" in files ->
-            {:ok, bin} = File.read(file_path)
-            data = Base.encode64(bin)
-            File.rm(file_path)
-            json(conn, %{data: data, message: "Message found in inbox.", code: "INCOMING"})
-
-          length(files) > 0 ->
-            json(conn, %{
-              data: nil,
-              message: "No incoming message found. Outgoing message present.",
-              code: "OUTGOING"
-            })
-
-          true ->
-            json(conn, %{
-              data: nil,
-              message: "No incoming or outgoing messages found.",
-              code: "EMPTY"
-            })
-        end
-
-      {:error, reason} ->
-        json(conn, reason)
-    end
+    exists? = File.exists?(file_path)
+    json(conn, exists?)
   end
 
   ## helpers

@@ -31,6 +31,13 @@ class DLinkClient {
     return inboxData;
   }
 
+  async hasMessage(owner) {
+    const url = `${this.host}/v1/status/${owner}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  }
+
   async inbox() {
     logToScreen(this.cEl, "Checking inbox...");
     const url = `${this.host}/v1/inbox/${this.key}/${this.clientName}`;
@@ -59,7 +66,7 @@ class DLinkClient {
       logToScreen(this.cEl, "Uploading...");
       await this.recordingUpload();
       logToScreen(this.cEl, "Done");
-      this.inbox();
+      // this.inbox();
     };
     this.mediaRecorder.start();
     this.state = "RECORDING";
