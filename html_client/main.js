@@ -3,6 +3,7 @@ const audioElement = document.getElementById("audioPlayback");
 const consoleElement = document.getElementById("console");
 const switchButtonElement = document.getElementById("switchBtn");
 const bodyElement = document.body;
+const letterElement = document.getElementById("letter");
 
 const clientA = "tk-a2a5729c1-309b-40b2-a61e";
 const clientB = "tk-b4b6f3c2d-45d6-b789-c4b5";
@@ -66,8 +67,14 @@ async function handleClick() {
 buttonElement.addEventListener("click", handleClick);
 
 switchButtonElement.addEventListener("click", () => {
-  if (bodyElement.classList.contains("alt")) client.changeClient(clientA);
-  else client.changeClient(clientB);
-  bodyElement.classList.toggle("alt");
+  consoleElement.textContent = "";
   client.state = "idle";
+  if (bodyElement.classList.contains("alt")) {
+    client.changeClient(clientA);
+    letterElement.textContent = "A";
+  } else {
+    client.changeClient(clientB);
+    letterElement.textContent = "B";
+  }
+  bodyElement.classList.toggle("alt");
 });
