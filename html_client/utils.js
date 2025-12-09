@@ -19,11 +19,10 @@ function logToScreen(consoleEl, data, type) {
     const formattedData = JSON.stringify(truncObj, null, 2);
 
     // Concanetnate previous data, new data, and timestamp
-    consoleEl.textContent = `${consoleEl.textContent}--${timestamp}--\n${formattedData}\n\n`;
+    consoleEl.textContent = `${consoleEl.textContent}>> ${timestamp}\n${formattedData}\n\n`;
   } else {
     // Single line message
-    const hasText = consoleEl.textContent.length > 0;
-    consoleEl.textContent = `${consoleEl.textContent}--${timestamp}--\n${data}\n\n`;
+    consoleEl.textContent = `${consoleEl.textContent}>> ${timestamp}\n${data}\n\n`;
   }
 
   // Scroll to bottom
