@@ -5,6 +5,10 @@ defmodule DlinkWeb.MessageController do
   @root Application.compile_env(:dlink, :data_root, "inbox")
   @read_opts [length: 64_000, read_timeout: 30_000]
 
+  ##############################################################
+  # Make sure client keys are limited to prevent rouge uploads #
+  ##############################################################
+
   # POST /v1/upload/:owner
   # Body: raw bytes (e.g., audio/ogg). Saves atomically as "<recipient>.ogg".
   def upload(conn, %{"owner" => owner}) do
