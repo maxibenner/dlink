@@ -62,6 +62,12 @@ pre {
   right: 24px;
 }
 
+#idsBtn {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+}
+
 #letter {
   position: absolute;
   bottom: -0.3em;

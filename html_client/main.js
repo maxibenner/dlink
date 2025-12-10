@@ -2,11 +2,14 @@ const buttonElement = document.getElementById("btn");
 const audioElement = document.getElementById("audioPlayback");
 const consoleElement = document.getElementById("console");
 const switchButtonElement = document.getElementById("switchBtn");
+const changeIdsButtonElement = document.getElementById("idsBtn");
 const bodyElement = document.body;
 const letterElement = document.getElementById("letter");
 
-const clientA = "tk-a2a5729c1-309b-40b2-a61e";
-const clientB = "tk-b4b6f3c2d-45d6-b789-c4b5";
+const clientA =
+  localStorage.getItem("keySelf") || "tk-a123";
+const clientB =
+  localStorage.getItem("keyPartner") || "tk-b456";
 
 const client = new DLinkClient({
   keySelf: clientA,
@@ -87,4 +90,23 @@ switchButtonElement.addEventListener("click", () => {
     letterElement.textContent = "B";
   }
   bodyElement.classList.toggle("alt");
+});
+
+changeIdsButtonElement.addEventListener("click", () => {
+  const newKeySelf = prompt(`Enter new ID for A:`);
+  const newKeyPartner = prompt("Enter new ID for B:");
+  if (newKeySelf) {
+    client.keySelf = newKeySelf.trim();
+    logToScreen(consoleElement, `ID A changed to ${client.keySelf}`);
+    // Save to localStorage
+    localStorage.setItem("keySelf", client.keySelf);
+  }
+  if (newKeyPartner) {
+    client.keyPartner = newKeyPartner.trim();
+    logToScreen(consoleElement, `ID B changed to ${client.keyPartner}`);
+    // Save to localStorage
+    localStorage.setItem("keyPartner", client.keyPartner);
+  }
+
+  client.powerOn();
 });

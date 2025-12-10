@@ -167,7 +167,7 @@ class DLinkClient {
   powerOn() {
     logToScreen(
       consoleElement,
-      `Client ${client.keySelf} [click to check your inbox]`
+      `Client: ${client.keySelf} [click to check your inbox]`
     );
     this.state = "idle";
   }
