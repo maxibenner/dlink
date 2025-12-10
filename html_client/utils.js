@@ -28,3 +28,8 @@ function logToScreen(consoleEl, data, type) {
   // Scroll to bottom
   consoleEl.scrollTop = consoleEl.scrollHeight;
 }
+
+// Clear screen console
+function clearScreen(consoleEl) {
+  consoleEl.textContent = "";
+}

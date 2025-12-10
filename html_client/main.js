@@ -9,20 +9,43 @@ const clientA = "tk-a2a5729c1-309b-40b2-a61e";
 const clientB = "tk-b4b6f3c2d-45d6-b789-c4b5";
 
 const client = new DLinkClient({
-  key: clientA,
+  keySelf: clientA,
+  keyPartner: clientB,
   host: "http://localhost:4000",
   consoleElement,
 });
-
-logToScreen(consoleElement, `Initialized with key: ${client.key}`);
 
 // Request mic permission on page load
 const permission = navigator.mediaDevices.getUserMedia({ audio: true });
 
 async function handleClick() {
+  // Power on
+  if (client.state === "off") {
+    client.powerOn();
+    return;
+  }
+
   // Check if client with <key> has message in inbox
   if (client.state === "idle") {
-    await client.hasMessage();
+    await client.checkOwnInbox();
+    return;
+  }
+
+  // Download if message available
+  if (client.state === "readyToDownload") {
+    await client.recDownload(audioElement);
+    return;
+  }
+
+  // Play downloaded message
+  if (client.state === "readyToPlay") {
+    await client.recPlay(audioElement);
+    return;
+  }
+
+  // Check partner inbox if ready
+  if (client.state === "readyToCheckPartner") {
+    await client.checkPartnerInbox();
     return;
   }
 
@@ -44,36 +67,23 @@ async function handleClick() {
     return;
   }
 
-  // switch (client.state) {
-  //   case "INCOMING":
-  //     audioElement.src = client.audioObjUrl;
-  //     audioElement.play();
-  //     logToScreen(consoleElement, "Playback started.");
-  //     audioElement.onended = () => {
-  //       logToScreen(consoleElement, "Playback finished.");
-  //       // client.inbox();
-  //     };
-  //     break;
-  //   case "EMPTY":
-  //     client.recordingStart();
-  //     break;
-  //   case "RECORDING": {
-  //     client.recordingStop();
-  //     break;
-  //   }
-  // }
+  // Power down if ready
+  if (client.state === "readyToPowerDown") {
+    client.powerDown();
+    return;
+  }
 }
 
 buttonElement.addEventListener("click", handleClick);
 
 switchButtonElement.addEventListener("click", () => {
   consoleElement.textContent = "";
-  client.state = "idle";
+  client.state = client.state === "off" ? "off" : "idle";
   if (bodyElement.classList.contains("alt")) {
-    client.changeClient(clientA);
+    client.toggleClient();
     letterElement.textContent = "A";
   } else {
-    client.changeClient(clientB);
+    client.toggleClient();
     letterElement.textContent = "B";
   }
   bodyElement.classList.toggle("alt");

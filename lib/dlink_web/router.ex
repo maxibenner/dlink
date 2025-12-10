@@ -11,5 +11,6 @@ defmodule DlinkWeb.Router do
     get "/status/:owner", MessageController, :status
     get "/download/:owner", MessageController, :download
     post "/upload/:owner", MessageController, :upload
+    delete "/delete/:owner", MessageController, :delete
   end
 end
