@@ -6,16 +6,15 @@ const changeIdsButtonElement = document.getElementById("idsBtn");
 const bodyElement = document.body;
 const letterElement = document.getElementById("letter");
 
-const clientA =
-  localStorage.getItem("keySelf") || "tk-a123";
-const clientB =
-  localStorage.getItem("keyPartner") || "tk-b456";
+const clientA = localStorage.getItem("keySelf") || "tk-a123";
+const clientB = localStorage.getItem("keyPartner") || "tk-b456";
 
 const client = new DLinkClient({
   keySelf: clientA,
   keyPartner: clientB,
   host: "http://localhost:4000",
   consoleElement,
+  activeClient: "self",
 });
 
 // Request mic permission on page load
@@ -82,31 +81,27 @@ buttonElement.addEventListener("click", handleClick);
 switchButtonElement.addEventListener("click", () => {
   consoleElement.textContent = "";
   client.state = client.state === "off" ? "off" : "idle";
-  if (bodyElement.classList.contains("alt")) {
-    client.toggleClient();
-    letterElement.textContent = "A";
-  } else {
-    client.toggleClient();
-    letterElement.textContent = "B";
-  }
+  client.toggleClient();
+  letterElement.textContent = client.ac === "self" ? "A" : "B";
   bodyElement.classList.toggle("alt");
 });
 
 changeIdsButtonElement.addEventListener("click", () => {
-  const newKeySelf = prompt(`Enter new ID for A:`);
-  const newKeyPartner = prompt("Enter new ID for B:");
-  if (newKeySelf) {
+  const newKeySelf = prompt(`Enter new ID for A:`, client.keySelf);
+  const newKeyPartner = prompt("Enter new ID for B:", client.keyPartner);
+  if (newKeySelf && newKeySelf !== client.keySelf) {
     client.keySelf = newKeySelf.trim();
     logToScreen(consoleElement, `ID A changed to ${client.keySelf}`);
     // Save to localStorage
     localStorage.setItem("keySelf", client.keySelf);
   }
-  if (newKeyPartner) {
+  if (newKeyPartner && newKeyPartner !== client.keyPartner) {
     client.keyPartner = newKeyPartner.trim();
     logToScreen(consoleElement, `ID B changed to ${client.keyPartner}`);
     // Save to localStorage
     localStorage.setItem("keyPartner", client.keyPartner);
   }
 
-  client.powerOn();
+  if (newKeySelf !== client.keySelf || newKeyPartner !== client.keyPartner)
+    client.powerOn();
 });

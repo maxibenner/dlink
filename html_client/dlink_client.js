@@ -5,6 +5,7 @@ class DLinkClient {
     host,
     defaultState = "off", // off, idle, readyToDownload, readyToPlay, readyToCheckPartner, readyToRecord, recording, recorded, uploading, readyToPowerDown
     consoleElement,
+    activeClient,
   }) {
     this.keySelf = keySelf;
     this.keyPartner = keyPartner;
@@ -15,6 +16,7 @@ class DLinkClient {
     this.audioBlob = null;
     this.mediaRecorder = null;
     this.chunks = [];
+    this.ac = activeClient; // self or partner
 
     // DOM elements
     this.cEl = consoleElement;
@@ -24,7 +26,9 @@ class DLinkClient {
    * Check own inbox
    */
   async checkOwnInbox() {
-    const url = `${this.host}/v1/status/${this.keySelf}`;
+    const url = `${this.host}/v1/status/${
+      this.ac === "self" ? this.keySelf : this.keyPartner
+    }`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -48,7 +52,9 @@ class DLinkClient {
    * Check partner inbox
    */
   async checkPartnerInbox() {
-    const url = `${this.host}/v1/status/${this.keyPartner}`;
+    const url = `${this.host}/v1/status/${
+      this.ac === "self" ? this.keyPartner : this.keySelf
+    }`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -73,7 +79,9 @@ class DLinkClient {
    */
   async recDownload() {
     logToScreen(this.cEl, "Downloading message...");
-    const url = `${this.host}/v1/download/${this.keySelf}`;
+    const url = `${this.host}/v1/download/${
+      this.ac === "self" ? this.keySelf : this.keyPartner
+    }`;
     const response = await fetch(url);
     const blob = await response.blob();
     this.audioBlob = blob;
@@ -149,7 +157,9 @@ class DLinkClient {
     logToScreen(this.cEl, "Uploading message...");
 
     this.state = "uploading";
-    const url = `${this.host}/v1/upload/${this.keyPartner}`;
+    const url = `${this.host}/v1/upload/${
+      this.ac === "self" ? this.keyPartner : this.keySelf
+    }`;
     const response = await fetch(url, {
       method: "POST",
       body: this.audioBlob,
@@ -167,7 +177,9 @@ class DLinkClient {
   powerOn() {
     logToScreen(
       consoleElement,
-      `Client: ${client.keySelf} [click to check your inbox]`
+      `Client: ${
+        this.ac === "self" ? this.keySelf : this.keyPartner
+      } [click to check your inbox]`
     );
     this.state = "idle";
   }
@@ -184,16 +196,15 @@ class DLinkClient {
    * Switch client key
    */
   toggleClient() {
-    const newKeySelf = this.keySelf;
-    const newKeyPartner = this.keyPartner;
-    this.keySelf = newKeyPartner;
-    this.keyPartner = newKeySelf;
+    this.ac = this.ac === "self" ? "partner" : "self";
 
-    if (this.state !== "off") {
-      logToScreen(
-        this.cEl,
-        `Switched to client ${this.keySelf} [click to check your inbox]`
-      );
-    }
+    logToScreen(
+      this.cEl,
+      `Switched to client ${
+        this.ac === "self" ? this.keySelf : this.keyPartner
+      } [click to check your inbox]`
+    );
+
+    this.state = "idle";
   }
 }
