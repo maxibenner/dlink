@@ -56,18 +56,6 @@ pre {
   border-radius: 12px;
 }
 
-#switchBtn {
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-}
-
-#idsBtn {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-}
-
 #letter {
   position: absolute;
   bottom: -0.3em;
@@ -78,4 +66,25 @@ pre {
   z-index: -1;
   opacity: 0.1;
   transform: rotate(10deg);
+}
+
+button.secondary {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 3px 6px;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+#switchBtn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+}
+
+#idsBtn {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
 }
