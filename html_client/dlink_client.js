@@ -26,9 +26,9 @@ class DLinkClient {
    * Check own inbox
    */
   async checkOwnInbox() {
-    const url = `${this.host}/v1/status/${
+    const url = `${this.host}/v1/${
       this.ac === "self" ? this.keySelf : this.keyPartner
-    }`;
+    }/inbox`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -52,9 +52,9 @@ class DLinkClient {
    * Check partner inbox
    */
   async checkPartnerInbox() {
-    const url = `${this.host}/v1/status/${
+    const url = `${this.host}/v1/${
       this.ac === "self" ? this.keyPartner : this.keySelf
-    }`;
+    }/inbox`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -79,9 +79,9 @@ class DLinkClient {
    */
   async recDownload() {
     logToScreen(this.cEl, "Downloading message...");
-    const url = `${this.host}/v1/download/${
+    const url = `${this.host}/v1/${
       this.ac === "self" ? this.keySelf : this.keyPartner
-    }`;
+    }/inbox/message`;
     const response = await fetch(url);
     const blob = await response.blob();
     this.audioBlob = blob;
@@ -109,9 +109,9 @@ class DLinkClient {
       audioEl.onended = () => {
         logToScreen(
           this.cEl,
-          "Playback ended [click to check your partner's inbox]"
+          "Playback ended [click to delete message from server]"
         );
-        this.state = "readyToCheckPartner";
+        this.state = "readyToDelete";
         resolve();
       };
     });
@@ -157,9 +157,9 @@ class DLinkClient {
     logToScreen(this.cEl, "Uploading message...");
 
     this.state = "uploading";
-    const url = `${this.host}/v1/upload/${
+    const url = `${this.host}/v1/${
       this.ac === "self" ? this.keyPartner : this.keySelf
-    }`;
+    }/inbox/message`;
     const response = await fetch(url, {
       method: "POST",
       body: this.audioBlob,
@@ -168,6 +168,25 @@ class DLinkClient {
     const json = await response.json();
     this.state = "readyToPowerDown";
     logToScreen(consoleElement, "Upload complete [click to power down]");
+    return json;
+  }
+
+  /**
+   * Delete own message from inbox
+   */
+  async recDelete() {
+    logToScreen(this.cEl, "Deleting message...");
+
+    const url = `${this.host}/v1/${
+      this.ac === "self" ? this.keySelf : this.keyPartner
+    }/inbox/message`;
+    const response = await fetch(url, {
+      method: "DELETE",
+    });
+
+    const json = await response.json();
+    this.state = "readyToCheckPartner";
+    logToScreen(this.cEl, "Message deleted [click to check your partner's inbox]");
     return json;
   }
 

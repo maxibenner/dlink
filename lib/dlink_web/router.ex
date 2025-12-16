@@ -8,9 +8,11 @@ defmodule DlinkWeb.Router do
 
   scope "/v1", DlinkWeb do
     pipe_through :api
-    get "/status/:owner", MessageController, :status
-    get "/download/:owner", MessageController, :download
-    post "/upload/:owner", MessageController, :upload
-    delete "/delete/:owner", MessageController, :delete
+    # Message inbox status
+    get "/:owner/inbox", MessageController, :status
+    # CRUD for messages
+    get "/:owner/inbox/message", MessageController, :download
+    post "/:owner/inbox/message", MessageController, :upload
+    delete "/:owner/inbox/message", MessageController, :delete
   end
 end

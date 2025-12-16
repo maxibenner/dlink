@@ -45,6 +45,12 @@ async function handleClick() {
     return;
   }
 
+  // Delete message from server after playing
+  if (client.state === "readyToDelete") {
+    await client.recDelete();
+    return;
+  }
+
   // Check partner inbox if ready
   if (client.state === "readyToCheckPartner") {
     await client.checkPartnerInbox();

@@ -9,7 +9,7 @@ defmodule DlinkWeb.MessageController do
   # Make sure client keys are limited to prevent rouge uploads #
   ##############################################################
 
-  # POST /v1/upload/:owner
+  # POST /v1/:owner/inbox/message
   # Body: raw bytes (e.g., audio/ogg). Saves atomically as "<recipient>.ogg".
   def upload(conn, %{"owner" => owner}) do
     tmp = Path.join(@root, "#{owner}.ogg.part")
@@ -29,8 +29,9 @@ defmodule DlinkWeb.MessageController do
     end
   end
 
-  # GET /v1/download/:owner  -> file
+  # GET /v1/:owner/inbox/message  -> file
   # Serves <owner>.ogg if it exists
+  @spec download(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def download(conn, %{"owner" => owner}) do
     file_path = Path.join(@root, "#{owner}.ogg")
 
@@ -43,7 +44,21 @@ defmodule DlinkWeb.MessageController do
     end
   end
 
-  # GET /v1/inbox/:owner  -> boolean
+  # DELETE /v1/:owner/inbox/message  -> boolean
+  # Deletes <owner>.ogg if it exists, returns whether it was deleted
+  def delete(conn, %{"owner" => owner}) do
+    file_path = Path.join(@root, "#{owner}.ogg")
+
+    deleted =
+      case File.rm(file_path) do
+        :ok -> true
+        {:error, :enoent} -> false
+      end
+
+    json(conn, deleted)
+  end
+
+  # GET /v1/:owner/inbox  -> boolean
   # Checks if <owner>.ogg exists
   def status(conn, %{"owner" => owner}) do
     Logger.debug("running")
