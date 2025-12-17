@@ -7,6 +7,16 @@ defmodule DlinkWeb.Router do
     plug DlinkWeb.Plugs.GuardSecret
   end
 
+  pipeline :public do
+    plug :accepts, ["html"]
+  end
+
+  scope "/", DlinkWeb do
+    pipe_through :public
+
+    get "/", RootController, :show
+  end
+
   scope "/", DlinkWeb do
     pipe_through :api
 
