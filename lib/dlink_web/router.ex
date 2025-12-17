@@ -7,6 +7,12 @@ defmodule DlinkWeb.Router do
     plug DlinkWeb.Plugs.GuardSecret
   end
 
+  scope "/", DlinkWeb do
+    pipe_through :api
+
+    get "/health", HealthController, :show
+  end
+
   scope "/v1", DlinkWeb do
     pipe_through :api
     # Message inbox status
