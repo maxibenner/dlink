@@ -14,18 +14,23 @@ defmodule DlinkWeb.MessageController do
   def upload(conn, %{"owner" => owner}) do
     tmp = Path.join(@root, "#{owner}.ogg.part")
     final = Path.join(@root, "#{owner}.ogg")
-    {:ok, fd} = File.open(tmp, [:write, :raw, :binary])
+    with :ok <- ensure_data_root(),
+         {:ok, fd} <- File.open(tmp, [:write, :raw, :binary]) do
+      case stream_to_fd(conn, fd, 0) do
+        {:ok, total, conn1} ->
+          File.close(fd)
+          File.rename!(tmp, final)
+          json(conn1, %{to: owner, bytes: total})
 
-    case stream_to_fd(conn, fd, 0) do
-      {:ok, total, conn1} ->
-        File.close(fd)
-        File.rename!(tmp, final)
-        json(conn1, %{to: owner, bytes: total})
-
-      {:error, :timeout, conn1} ->
-        File.close(fd)
-        File.rm(tmp)
-        send_resp(conn1, 408, "timeout")
+        {:error, :timeout, conn1} ->
+          File.close(fd)
+          File.rm(tmp)
+          send_resp(conn1, 408, "timeout")
+      end
+    else
+      {:error, reason} ->
+        Logger.error("failed to prepare inbox directory", owner: owner, reason: inspect(reason))
+        send_resp(conn, 500, "storage_unavailable")
     end
   end
 
@@ -82,5 +87,9 @@ defmodule DlinkWeb.MessageController do
       {:error, :timeout} ->
         {:error, :timeout, conn}
     end
+  end
+
+  defp ensure_data_root do
+    File.mkdir_p(@root)
   end
 end
