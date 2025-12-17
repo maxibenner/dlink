@@ -12,7 +12,8 @@ const clientB = localStorage.getItem("keyPartner") || "tk-b456";
 const client = new DLinkClient({
   keySelf: clientA,
   keyPartner: clientB,
-  host: "http://localhost:4000",
+  // Change for local dev
+  host: "https://dlink.maximilianbenner.com",
   consoleElement,
   activeClient: "self",
 });
