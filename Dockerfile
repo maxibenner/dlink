@@ -48,7 +48,7 @@ RUN mix deps.compile
 
 RUN mix assets.setup
 
-# COPY priv priv
+COPY priv priv
 
 COPY lib lib
 

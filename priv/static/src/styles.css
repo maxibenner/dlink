@@ -1,0 +1,90 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  background-color: rgb(255, 204, 0);
+  padding: 24px;
+  overflow: hidden;
+}
+
+body.alt {
+  background-color: rgb(36, 69, 255);
+}
+
+#btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  background: #efefef;
+  font-weight: bold;
+  width: 100px;
+  height: 100px;
+  background-color: rgb(255, 204, 0);
+  border-radius: 50px;
+
+  box-shadow: 0 6px 0 rgb(214, 171, 0);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+body.alt #btn {
+  background-color: rgb(36, 69, 255);
+  box-shadow: 0 6px 0 rgb(28, 54, 200);
+}
+
+pre {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: black;
+  padding: 12px;
+  color: white;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  border-radius: 12px;
+}
+
+#letter {
+  position: absolute;
+  bottom: -0.3em;
+  right: -0.1em;
+  font-size: 400px;
+  font-weight: bold;
+  font-family: sans-serif;
+  z-index: -1;
+  opacity: 0.1;
+  transform: rotate(10deg);
+}
+
+button.secondary {
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 3px 6px;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+#switchBtn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+}
+
+#idsBtn {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+}

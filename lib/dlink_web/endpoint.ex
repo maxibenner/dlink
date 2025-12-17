@@ -26,6 +26,9 @@ defmodule DlinkWeb.Endpoint do
     gzip: not code_reloading?,
     only: DlinkWeb.static_paths()
 
+  # Serve index.html for root
+  plug Plug.Static.IndexHtml, at: "/"
+
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
