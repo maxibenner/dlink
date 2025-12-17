@@ -30,6 +30,13 @@ class DLinkClient {
       this.ac === "self" ? this.keySelf : this.keyPartner
     }/inbox`;
     const response = await fetch(url);
+
+    // Make sure response is ok
+    if (!response.ok) {
+      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      return;
+    }
+
     const data = await response.json();
 
     if (!data) {
@@ -56,6 +63,13 @@ class DLinkClient {
       this.ac === "self" ? this.keyPartner : this.keySelf
     }/inbox`;
     const response = await fetch(url);
+
+    // Make sure response is ok
+    if (!response.ok) {
+      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      return;
+    }
+
     const data = await response.json();
 
     if (!data) {
@@ -83,6 +97,13 @@ class DLinkClient {
       this.ac === "self" ? this.keySelf : this.keyPartner
     }/inbox/message`;
     const response = await fetch(url);
+
+    // Make sure response is ok
+    if (!response.ok) {
+      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      return;
+    }
+
     const blob = await response.blob();
     this.audioBlob = blob;
 
@@ -165,6 +186,12 @@ class DLinkClient {
       body: this.audioBlob,
     });
 
+    // Make sure response is ok
+    if (!response.ok) {
+      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      return;
+    }
+
     const json = await response.json();
     this.state = "readyToPowerDown";
     logToScreen(consoleElement, "Upload complete [click to power down]");
@@ -186,7 +213,10 @@ class DLinkClient {
 
     const json = await response.json();
     this.state = "readyToCheckPartner";
-    logToScreen(this.cEl, "Message deleted [click to check your partner's inbox]");
+    logToScreen(
+      this.cEl,
+      "Message deleted [click to check your partner's inbox]"
+    );
     return json;
   }
 

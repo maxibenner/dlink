@@ -108,6 +108,8 @@ changeIdsButtonElement.addEventListener("click", () => {
     localStorage.setItem("keyPartner", client.keyPartner);
   }
 
-  if (newKeySelf !== client.keySelf || newKeyPartner !== client.keyPartner)
+  if (newKeySelf !== client.keySelf || newKeyPartner !== client.keyPartner) {
+    window.location.reload();
     client.powerOn();
+  }
 });

@@ -11,7 +11,7 @@ body {
   grid-template-rows: 1fr 1fr;
   align-items: center;
   justify-items: center;
-  background-color: rgb(255, 225, 0);
+  background-color: rgb(255, 204, 0);
   padding: 24px;
   overflow: hidden;
 }
@@ -29,10 +29,10 @@ body.alt {
   font-weight: bold;
   width: 100px;
   height: 100px;
-  background-color: rgb(255, 225, 0);
+  background-color: rgb(255, 204, 0);
   border-radius: 50px;
 
-  box-shadow: 0 6px 0 rgb(200, 180, 0);
+  box-shadow: 0 6px 0 rgb(214, 171, 0);
   border: 2px solid rgba(0, 0, 0, 0.2);
   cursor: pointer;
 }

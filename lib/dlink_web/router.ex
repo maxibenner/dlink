@@ -4,6 +4,7 @@ defmodule DlinkWeb.Router do
   pipeline :api do
     plug CORSPlug, origin: "http://localhost:5000"
     plug :accepts, ["json"]
+    plug DlinkWeb.Plugs.GuardSecret
   end
 
   scope "/v1", DlinkWeb do

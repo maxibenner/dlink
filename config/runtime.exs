@@ -20,6 +20,21 @@ if System.get_env("PHX_SERVER") do
   config :dlink, DlinkWeb.Endpoint, server: true
 end
 
+guard_secret =
+  case config_env() do
+    :prod ->
+      System.get_env("GUARD_SECRET") ||
+        raise """
+        environment variable GUARD_SECRET is missing.
+        Set it in Coolify (or your deployment target) so owner-based requests can be authorized.
+        """
+
+    _ ->
+      System.get_env("GUARD_SECRET") || "dev-guard-secret"
+  end
+
+config :dlink, :guard_secret, guard_secret
+
 if config_env() == :prod do
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
