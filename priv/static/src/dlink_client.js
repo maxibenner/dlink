@@ -33,7 +33,7 @@ class DLinkClient {
 
     // Make sure response is ok
     if (!response.ok) {
-      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      logToScreen(this.cEl, `Request failed`);
       return;
     }
 
@@ -66,7 +66,7 @@ class DLinkClient {
 
     // Make sure response is ok
     if (!response.ok) {
-      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      logToScreen(this.cEl, `Request failed`);
       return;
     }
 
@@ -100,7 +100,7 @@ class DLinkClient {
 
     // Make sure response is ok
     if (!response.ok) {
-      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      logToScreen(this.cEl, `Request failed`);
       return;
     }
 
@@ -188,7 +188,7 @@ class DLinkClient {
 
     // Make sure response is ok
     if (!response.ok) {
-      logToScreen(this.cEl, `Error: ${response.statusText}`);
+      logToScreen(this.cEl, `Request failed`);
       return;
     }
 
