@@ -13,7 +13,7 @@ const client = new DLinkClient({
   keySelf: clientA,
   keyPartner: clientB,
   // Change for local dev
-  host: "http://dlink.maximilianbenner.com",
+  host: "https://dlink.maximilianbenner.com",
   consoleElement,
   activeClient: "self",
 });
