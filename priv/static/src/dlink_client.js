@@ -14,8 +14,12 @@ class DLinkClient {
     this.eventListeners = {};
     this.audioObjUrl = null;
     this.audioBlob = null;
-    this.mediaRecorder = null;
-    this.chunks = [];
+    this.stream = null;
+    this.audioContext = null;
+    this.mediaStreamSource = null;
+    this.processor = null;
+    this.silenceGain = null;
+    this.recordedBuffers = [];
     this.ac = activeClient; // self or partner
 
     // DOM elements
@@ -142,31 +146,41 @@ class DLinkClient {
    * Start recording audio
    */
   async recStart() {
-    // Handle permissions
     if (!navigator.mediaDevices) throw new Error("MediaDevices not supported");
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) throw new Error("Web Audio API not supported");
 
-    // Start recording
+    this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    this.audioContext = new AudioContextCtor();
+    this.mediaStreamSource = this.audioContext.createMediaStreamSource(this.stream);
+    this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+    this.silenceGain = this.audioContext.createGain();
+    this.silenceGain.gain.value = 0;
+    this.recordedBuffers = [];
+
+    this.processor.onaudioprocess = (event) => {
+      const channelData = event.inputBuffer.getChannelData(0);
+      this.recordedBuffers.push(new Float32Array(channelData));
+    };
+
+    this.mediaStreamSource.connect(this.processor);
+    this.processor.connect(this.silenceGain);
+    this.silenceGain.connect(this.audioContext.destination);
+
     this.state = "recording";
     logToScreen(this.cEl, "Recording started... [click to stop]");
-    this.mediaRecorder = new MediaRecorder(stream);
-    this.chunks = [];
-    this.mediaRecorder.ondataavailable = (e) => {
-      if (e.data.size > 0) this.chunks.push(e.data);
-    };
-    this.mediaRecorder.onstop = async () => {
-      this.audioBlob = new Blob(this.chunks, { type: "audio/ogg" });
-    };
-    this.mediaRecorder.start();
   }
 
   /**
    * Stop recording audio
    */
   recStop() {
+    if (!this.stream) throw new Error("No active recording session");
+
     this.state = "idle";
     logToScreen(this.cEl, "Recording stopped [click to upload]");
-    this.mediaRecorder.stop();
+
+    this._finalizeRecording();
     this.state = "recorded";
   }
 
@@ -194,7 +208,7 @@ class DLinkClient {
 
     const json = await response.json();
     this.state = "readyToPowerDown";
-    logToScreen(consoleElement, "Upload complete [click to power down]");
+    logToScreen(this.cEl, "Upload complete [click to power down]");
     return json;
   }
 
@@ -225,7 +239,7 @@ class DLinkClient {
    */
   powerOn() {
     logToScreen(
-      consoleElement,
+      this.cEl,
       `Client: ${
         this.ac === "self" ? this.keySelf : this.keyPartner
       } [click to check your inbox]`
@@ -255,5 +269,100 @@ class DLinkClient {
     );
 
     this.state = "idle";
+  }
+
+  _finalizeRecording() {
+    if (this.stream) {
+      this.stream.getTracks().forEach((track) => track.stop());
+    }
+
+    const blob = this._createPcmBlob();
+    this.audioBlob = blob;
+    this._cleanupAudioGraph();
+
+    this.recordedBuffers = [];
+    this.stream = null;
+    return blob;
+  }
+
+  _cleanupAudioGraph() {
+    if (this.processor) {
+      this.processor.disconnect();
+      this.processor.onaudioprocess = null;
+    }
+    if (this.mediaStreamSource) this.mediaStreamSource.disconnect();
+    if (this.silenceGain) this.silenceGain.disconnect();
+
+    const context = this.audioContext;
+    this.processor = null;
+    this.mediaStreamSource = null;
+    this.silenceGain = null;
+
+    if (context && context.state !== "closed") {
+      context.close().catch(() => {});
+    }
+    this.audioContext = null;
+  }
+
+  _createPcmBlob() {
+    if (!this.recordedBuffers.length) return null;
+
+    const samples = this._mergeBuffers(this.recordedBuffers);
+    const sampleRate = this.audioContext?.sampleRate || 44100;
+    const wavBuffer = this._encode16BitWav(samples, sampleRate);
+    return new Blob([wavBuffer], { type: "audio/wav" });
+  }
+
+  _mergeBuffers(buffers) {
+    const totalLength = buffers.reduce((sum, buffer) => sum + buffer.length, 0);
+    const result = new Float32Array(totalLength);
+    let offset = 0;
+
+    buffers.forEach((buffer) => {
+      result.set(buffer, offset);
+      offset += buffer.length;
+    });
+
+    return result;
+  }
+
+  _encode16BitWav(samples, sampleRate) {
+    const bytesPerSample = 2;
+    const blockAlign = bytesPerSample * 1;
+    const byteRate = sampleRate * blockAlign;
+    const buffer = new ArrayBuffer(44 + samples.length * bytesPerSample);
+    const view = new DataView(buffer);
+
+    const writeString = (offset, string) => {
+      for (let i = 0; i < string.length; i += 1) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+
+    writeString(0, "RIFF");
+    view.setUint32(4, 36 + samples.length * bytesPerSample, true);
+    writeString(8, "WAVE");
+    writeString(12, "fmt ");
+    view.setUint32(16, 16, true); // Subchunk1Size
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bytesPerSample * 8, true); // Bits per sample
+    writeString(36, "data");
+    view.setUint32(40, samples.length * bytesPerSample, true);
+
+    this._floatTo16BitPCM(view, 44, samples);
+
+    return buffer;
+  }
+
+  _floatTo16BitPCM(view, offset, samples) {
+    for (let i = 0; i < samples.length; i += 1, offset += 2) {
+      let s = samples[i];
+      s = Math.max(-1, Math.min(1, s));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    }
   }
 }
