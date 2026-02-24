@@ -1,3 +1,5 @@
+const TARGET_SAMPLE_RATE = 11025; // more aggressive downsample (~75% smaller vs 44.1kHz)
+
 class DLinkClient {
   constructor({
     keySelf,
@@ -308,8 +310,14 @@ class DLinkClient {
     if (!this.recordedBuffers.length) return null;
 
     const samples = this._mergeBuffers(this.recordedBuffers);
-    const sampleRate = this.audioContext?.sampleRate || 44100;
-    const wavBuffer = this._encode16BitWav(samples, sampleRate);
+    const sourceSampleRate = this.audioContext?.sampleRate || 44100;
+    const targetSampleRate = Math.min(sourceSampleRate, TARGET_SAMPLE_RATE);
+    const processedSamples = this._downsampleBuffer(
+      samples,
+      targetSampleRate,
+      sourceSampleRate
+    );
+    const wavBuffer = this._encode16BitWav(processedSamples, targetSampleRate);
     return new Blob([wavBuffer], { type: "audio/wav" });
   }
 
@@ -322,6 +330,34 @@ class DLinkClient {
       result.set(buffer, offset);
       offset += buffer.length;
     });
+
+    return result;
+  }
+
+  _downsampleBuffer(buffer, targetSampleRate, sourceSampleRate) {
+    if (!buffer || !buffer.length) return buffer;
+    if (targetSampleRate >= sourceSampleRate) return buffer;
+
+    const sampleRateRatio = sourceSampleRate / targetSampleRate;
+    const newLength = Math.round(buffer.length / sampleRateRatio);
+    const result = new Float32Array(newLength);
+    let offsetResult = 0;
+    let offsetBuffer = 0;
+
+    while (offsetResult < newLength) {
+      const nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
+      let accum = 0;
+      let count = 0;
+
+      for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i += 1) {
+        accum += buffer[i];
+        count += 1;
+      }
+
+      result[offsetResult] = count > 0 ? accum / count : 0;
+      offsetResult += 1;
+      offsetBuffer = nextOffsetBuffer;
+    }
 
     return result;
   }
