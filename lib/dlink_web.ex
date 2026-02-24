@@ -17,7 +17,7 @@ defmodule DlinkWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(index.html src favicon.ico robots.txt)
+  def static_paths, do: ~w(index.html src favicon.ico robots.txt manifest.json icon.png sw.js)
 
   def router do
     quote do

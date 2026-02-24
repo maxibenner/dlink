@@ -91,6 +91,9 @@ switchButtonElement.addEventListener("click", () => {
   client.toggleClient();
   letterElement.textContent = client.ac === "self" ? "A" : "B";
   bodyElement.classList.toggle("alt");
+  const isAlt = bodyElement.classList.contains("alt");
+  const color = isAlt ? "rgb(36, 69, 255)" : "rgb(255, 204, 0)";
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", color);
 });
 
 changeIdsButtonElement.addEventListener("click", () => {
